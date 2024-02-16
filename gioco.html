@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contatore di clic</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 10px;
+      background-color: #333;
+      color: white;
+    }
+    #counterContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #counter {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #555;
+      color: white;
+      margin-top: 10px;
+      display: block;
+      margin-bottom: 10px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #goldCount {
+      font-size: 18px;
+      margin-top: 10px;
+      color: yellow;
+    }
+    #troopCount {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #armyPower {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Contatore di clic</h1>
+
+  <div id="counterContainer">
+    <div id="counter">0</div>
+  </div>
+
+  <button id="incrementButton">Clicca per incrementare</button>
+
+  <div id="goldCount">Lingotti d'oro: 0</div>
+  <button id="buyGoldButton">Compra lingotto</button>
+
+  <button id="buySoldiersButton">Compra 5 Soldati (1 lingotto)</button>
+  <button id="buyTankButton">Compra 1 Carroarmato (10 lingotti)</button>
+  <button id="buyPlaneButton">Compra 1 Aereo (7 lingotti)</button>
+
+  <div id="troopCount">Soldati: 0 | Carri armati: 0 | Aerei: 0</div>
+
+  <div id="armyPower">Potenza esercito: 0</div>
+
+  <ul id="playerList"></ul>
+
+  <script>
+    var goldCount = 0;
+    var soldiersCount = 0;
+    var tanksCount = 0;
+    var planesCount = 0;
+
+    function incrementa() {
+      var counterValue = getPlayerScore();
+      counterValue++;
+      document.getElementById('counter').innerText = counterValue;
+      
+      if (counterValue >= 10) {
+        document.getElementById('buyGoldButton').style.display = 'inline-block';
+      }
+
+      localStorage.setItem("playerScore", counterValue);
+      updatePlayerList();
+      updateTroopCount();
+      updateArmyPower();
+    }
+
+    function buyGold() {
+      var counterValue = getPlayerScore();
+
+      if (counterValue >= 10) {
+        counterValue -= 10;
+        goldCount++;
+        document.getElementById('counter').innerText = counterValue;
+        updateGoldCount();
+        updateTroopCount();
+        updateArmyPower();
+      }
+
+      localStorage.setItem("playerScore", counterValue);
+      localStorage.setItem("goldCount", goldCount);
+      updatePlayerList();
+    }
+
+    function buySoldiers() {
+      var counterValue = getPlayerScore();
+
+      if (goldCount >= 1) {
+        counterValue += 5;
+        goldCount -= 1;
+        soldiersCount += 5;
+        document.getElementById('counter').innerText = counterValue;
+        updateGoldCount();
+        updateTroopCount();
+        updateArmyPower();
+      }
+
+      localStorage.setItem("playerScore", counterValue);
+      localStorage.setItem("goldCount", goldCount);
+      localStorage.setItem("soldiersCount", soldiersCount);
+      updatePlayerList();
+    }
+
+    function buyTank() {
+      var counterValue = getPlayerScore();
+
+      if (goldCount >= 10) {
+        counterValue++;
+        goldCount -= 10;
+        tanksCount++;
+        document.getElementById('counter').innerText = counterValue;
+        updateGoldCount();
+        updateTroopCount();
+        updateArmyPower();
+      }
+
+      localStorage.setItem("playerScore", counterValue);
+      localStorage.setItem("goldCount", goldCount);
+      localStorage.setItem("tanksCount", tanksCount);
+      updatePlayerList();
+    }
+
+    function buyPlane() {
+      var counterValue = getPlayerScore();
+
+      if (goldCount >= 7) {
+        counterValue++;
+        goldCount -= 7;
+        planesCount++;
+        document.getElementById('counter').innerText = counterValue;
+        updateGoldCount();
+        updateTroopCount();
+        updateArmyPower();
+      }
+
+      localStorage.setItem("playerScore", counterValue);
+      localStorage.setItem("goldCount", goldCount);
+      localStorage.setItem("planesCount", planesCount);
+      updatePlayerList();
+    }
+
+    function updateGoldCount() {
+      document.getElementById('goldCount').innerText = "Lingotti d'oro: " + goldCount;
+    }
+
+    function updateTroopCount() {
+      document.getElementById('troopCount').innerText = "Soldati: " + soldiersCount + " | Carri armati: " + tanksCount + " | Aerei: " + planesCount;
+    }
+
+    function updateArmyPower() {
+      var armyPower = soldiersCount * 2 + tanksCount * 25 + planesCount * 20;
+      document.getElementById('armyPower').innerText = "Potenza esercito: " + armyPower;
+    }
+
+    function getPlayerScore() {
+      return parseInt(localStorage.getItem("playerScore")) || 0;
+    }
+
+    function getGoldCount() {
+      return parseInt(localStorage.getItem("goldCount")) || 0;
+    }
+
+    function getSoldiersCount() {
+      return parseInt(localStorage.getItem("soldiersCount")) || 0;
+    }
+
+    function getTanksCount() {
+      return parseInt(localStorage.getItem("tanksCount")) || 0;
+    }
+
+    function getPlanesCount() {
+      return parseInt(localStorage.getItem("planesCount")) || 0;
+    }
+
+    function updatePlayerList() {
+      var playerList = document.getElementById('playerList');
+      var playerScore = getPlayerScore();
+
+      var existingPlayerItem = document.getElementById('playerItem');
+      if (existingPlayerItem) {
+        existingPlayerItem.innerText = playerScore.toString();
+      } else {
+        var playerItem = document.createElement('div');
+        playerItem.id = 'playerItem';
+        playerItem.innerText = playerScore.toString();
+        document.body.appendChild(playerItem);
+      }
+    }
+
+    window.onload = function () {
+      goldCount = getGoldCount();
+      soldiersCount = getSoldiersCount();
+      tanksCount = getTanksCount();
+      planesCount = getPlanesCount();
+
+      updatePlayerList();
+      updateGoldCount();
+      updateTroopCount();
+      updateArmyPower();
+      document.getElementById('counter').innerText = getPlayerScore();
+    };
+
+    document.getElementById('incrementButton').addEventListener('click', incrementa);
+    document.getElementById('buyGoldButton').addEventListener('click', buyGold);
+    document.getElementById('buySoldiersButton').addEventListener('click', buySoldiers);
+    document.getElementById('buyTankButton').addEventListener('click', buyTank);
+    document.getElementById('buyPlaneButton').addEventListener('click', buyPlane);
+  </script>
+
+</body>
+</html>
